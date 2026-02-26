@@ -57,6 +57,9 @@ app.use("/api/workout-plans", workoutPlanRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/trainer', trainerRoutes);
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Backend is alive 🔥" });
+});
 
 // Error handler middleware
 app.use(errorHandler);

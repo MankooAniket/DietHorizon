@@ -80,14 +80,16 @@ function Navbar() {
 
 const styles = {
   navbar: {
-    background: 'linear-gradient(to right, #0f0f0f, #2c2c2c)',
-    padding: '16px 32px',
+    background: 'linear-gradient(to right, #070707, #1e1e1e)',
+    padding: '12px 40px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     position: 'sticky',
     top: 0,
     zIndex: 999,
+    boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
+    borderBottom: '1px solid #1f1f1f',
   },
   logoText: {
     textDecoration: 'none',
@@ -101,6 +103,7 @@ const styles = {
     gap: '18px',
     alignItems: 'center',
     margin: 0,
+    padding: 0,
   },
   link: {
     textDecoration: 'none',

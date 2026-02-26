@@ -6,7 +6,8 @@ const {
   updateUser,
   deleteUser,
   updateUserRole,
-  changePassword
+  changePassword,
+  getAllClients
 } = require("../controllers/userController");
 const { protectMiddleware, authorizeRoles } = require("../middlewares/authMiddleware");
 const validateRequest = require("../middlewares/validateMiddleware");

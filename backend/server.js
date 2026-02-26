@@ -7,6 +7,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/errorMiddleware');
 
+
 // Load env vars
 dotenv.config();
 
@@ -30,6 +31,8 @@ const app = express();
 
 // Body parser
 app.use(express.json());
+
+
 
 // Cookie parser
 app.use(cookieParser());

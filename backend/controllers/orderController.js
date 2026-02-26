@@ -1,7 +1,6 @@
 // controllers/orderController.js
 const Order = require('../models/orderModel');
 const Cart = require('../models/cartModel');
-const Product = require('../models/productModel');
 const ErrorResponse = require('../utils/errorResponse');
 const errorMessages = require('../utils/errorMessages');
 const asyncHandler = require('../middlewares/asyncHandler');
@@ -10,79 +9,63 @@ const asyncHandler = require('../middlewares/asyncHandler');
  * @desc    Place a new order
  * @route   POST /api/orders
  * @access  Private
+ *
+ * Adapted to work with the frontend Checkout component:
+ * - Expects items[], paymentMethod ('cod' etc.) and shippingAddress (text)
+ * - Creates a Cart document on the fly from the payload
  */
 const placeOrder = asyncHandler(async (req, res, next) => {
-  const { cartId, paymentMethod, shippingAddress } = req.body;
+  const { items, paymentMethod, shippingAddress } = req.body;
 
-  if (!cartId || !paymentMethod || !shippingAddress) {
+  if (!items || !Array.isArray(items) || items.length === 0 || !paymentMethod || !shippingAddress) {
     return next(new ErrorResponse(errorMessages.REQUIRED_FIELDS, 400));
   }
 
-  // Find the cart and verify it belongs to the user
-  const cart = await Cart.findById(cartId).populate("items.product");
-
-  if (!cart) {
-    return next(new ErrorResponse(errorMessages.CART_NOT_FOUND || "Cart not found", 404));
+  // Normalize payment method to match Order model enum
+  let normalizedPaymentMethod = paymentMethod;
+  if (paymentMethod.toLowerCase() === 'cod') {
+    normalizedPaymentMethod = 'COD';
   }
 
-  if (cart.user.toString() !== req.user.id) {
-    return next(new ErrorResponse(errorMessages.UNAUTHORIZED, 403));
-  }
-
-  // Check if cart is empty
-  if (cart.items.length === 0) {
-    return next(new ErrorResponse(errorMessages.CART_EMPTY || "Cannot place order with empty cart", 400));
-  }
-
-  // Check product availability
-  for (const item of cart.items) {
-    const product = await Product.findById(item.product._id);
-
-    if (!product) {
-      return next(new ErrorResponse(`Product ${item.product.name} no longer exists`, 400));
-    }
-
-    if (product.stock < item.quantity) {
-      return next(new ErrorResponse(`Insufficient stock for ${product.name}`, 400));
-    }
-
-    // Update product stock
-    product.stock -= item.quantity;
-    await product.save();
-  }
-
-  // Create new order
-  const order = await Order.create({
+  // Create a cart from the incoming items so existing order logic can still
+  // rely on the Cart + virtual totalPrice.
+  const cart = await Cart.create({
     user: req.user.id,
-    cart: cart._id,
-    totalAmount: cart.totalPrice,
-    paymentMethod,
-    shippingAddress,
-    status: "Pending",
-    paymentStatus: "Pending",
-    orderDate: Date.now()
+    items: items.map((item) => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: item.price,
+    })),
   });
 
-  // Clear the cart or mark it as processed
-  cart.isActive = false;
-  await cart.save();
+  // Reload cart to get virtuals
+  const populatedCart = await Cart.findById(cart._id);
 
-  // Return the created order
+  if (!populatedCart || populatedCart.items.length === 0) {
+    return next(new ErrorResponse(errorMessages.CART_EMPTY || 'Cannot place order with empty cart', 400));
+  }
+
+  // Create new order using cart's virtual totalPrice
+  const order = await Order.create({
+    user: req.user.id,
+    cart: populatedCart._id,
+    totalPrice: populatedCart.totalPrice,
+    paymentMethod: normalizedPaymentMethod,
+    shippingAddress,
+    status: 'Pending',
+    paymentStatus: 'Pending',
+    orderDate: Date.now(),
+  });
+
+  // Return populated order (user + cart only; items are stored directly on cart)
   const populatedOrder = await Order.findById(order._id)
-    .populate("user", "name email")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    });
+    .populate('user', 'name email')
+    .populate('cart');
 
   res.status(201).json({
     success: true,
-    message: "Order placed successfully",
-    data: populatedOrder
+    message: 'Order placed successfully',
+    data: populatedOrder,
   });
 });
 
@@ -93,15 +76,8 @@ const placeOrder = asyncHandler(async (req, res, next) => {
  */
 const getMyOrders = asyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user: req.user.id })
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    })
-    .sort({ orderDate: -1 });
+    .populate('cart')
+    .sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -118,14 +94,7 @@ const getMyOrders = asyncHandler(async (req, res, next) => {
 const getOrderById = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(req.params.id)
     .populate("user", "name email")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    });
+    .populate("cart");
 
   if (!order) {
     return next(new ErrorResponse(errorMessages.ORDER_NOT_FOUND, 404));
@@ -175,30 +144,10 @@ const cancelOrder = asyncHandler(async (req, res, next) => {
 
   await order.save();
 
-  // Return stock to inventory
-  const cart = await Cart.findById(order.cart).populate("items.product");
-
-  if (cart && cart.items.length > 0) {
-    for (const item of cart.items) {
-      const product = await Product.findById(item.product._id);
-      if (product) {
-        product.stock += item.quantity;
-        await product.save();
-      }
-    }
-  }
-
-  // Populate the order with necessary information for the response
+  // Reload with user + cart details
   const populatedOrder = await Order.findById(order._id)
     .populate("user", "name email")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    });
+    .populate("cart");
 
   res.status(200).json({
     success: true,
@@ -215,15 +164,8 @@ const cancelOrder = asyncHandler(async (req, res, next) => {
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const orders = await Order.find()
     .populate("user", "name email")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    })
-    .sort({ orderDate: -1 });
+    .populate("cart")
+    .sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -271,32 +213,10 @@ const updateOrderStatus = asyncHandler(async (req, res, next) => {
 
   await order.save();
 
-  // Handle stock updates if order is cancelled and items should be returned to inventory
-  if (status === "Cancelled" && order.status !== "Cancelled") {
-    const cart = await Cart.findById(order.cart).populate("items.product");
-
-    if (cart && cart.items.length > 0) {
-      for (const item of cart.items) {
-        const product = await Product.findById(item.product._id);
-        if (product) {
-          product.stock += item.quantity;
-          await product.save();
-        }
-      }
-    }
-  }
-
-  // Populate the order with necessary information for the response
+  // Reload with user + cart details
   const populatedOrder = await Order.findById(order._id)
     .populate("user", "name email")
-    .populate({
-      path: "cart",
-      populate: {
-        path: "items.product",
-        model: "Product",
-        select: "name price images"
-      }
-    });
+    .populate("cart");
 
   res.status(200).json({
     success: true,

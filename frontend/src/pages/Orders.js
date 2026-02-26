@@ -33,6 +33,8 @@ function Orders() {
   }, [user, navigate, fetchOrders]);
 
   const getStatusColor = (status) => {
+    if (!status) return '#636e72';
+    const s = status.toLowerCase();
     switch (status) {
       case 'pending':
         return '#f9ca24'; // Yellow
@@ -111,18 +113,18 @@ function Orders() {
               {order.cart && order.cart.items && order.cart.items.map(item => (
                 <div key={item._id} style={styles.orderItem}>
                   <img
-                    src={item.product.images[0] || '/placeholder.png'}
-                    alt={item.product.name}
+                    src={item.image || '/placeholder.png'}
+                    alt={item.name}
                     style={styles.productImage}
                   />
                   <div style={styles.productInfo}>
-                    <h4 style={styles.productName}>{item.product.name}</h4>
+                    <h4 style={styles.productName}>{item.name}</h4>
                     <p style={styles.productPrice}>
-                      ${item.price.toFixed(2)} x {item.quantity}
+                      Rs {item.price.toFixed(2)} x {item.quantity}
                     </p>
                   </div>
                   <div style={styles.itemTotal}>
-                    ${(item.price * item.quantity).toFixed(2)}
+                    Rs {(item.price * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}
@@ -131,7 +133,7 @@ function Orders() {
             <div style={styles.orderFooter}>
               <div style={styles.orderTotal}>
                 <span>Total:</span>
-                <span>${order.totalAmount.toFixed(2)}</span>
+                <span>Rs {(order.totalPrice || order.totalAmount || 0).toFixed(2)}</span>
               </div>
               {order.status === 'pending' && (
                 <button

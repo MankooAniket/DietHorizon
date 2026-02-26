@@ -39,8 +39,7 @@ const orderSchema = new mongoose.Schema(
         },
 
         shippingAddress: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            type: String,
             required: [true, "Shipping address is required"],
         },
     },

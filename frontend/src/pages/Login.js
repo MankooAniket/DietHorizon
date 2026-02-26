@@ -58,7 +58,7 @@ function Login() {
         {error && <div style={styles.error}>{error}</div>}
 
         <div style={styles.inputGroup}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email" style={styles.label}>Email</label>
           <input
             type="email"
             id="email"
@@ -71,7 +71,7 @@ function Login() {
         </div>
 
         <div style={styles.inputGroup}>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password" style={styles.label}>Password</label>
           <input
             type="password"
             id="password"
@@ -136,15 +136,23 @@ const styles = {
   },
   inputGroup: {
     marginBottom: '15px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  label: {
+    fontSize: '14px',
+    marginBottom: '6px',
+    color: '#e0e0e0',
   },
   input: {
     width: '100%',
-    padding: '10px',
-    backgroundColor: '#333',
-    border: 'none',
-    borderRadius: '4px',
+    padding: '10px 12px',
+    backgroundColor: '#1c1c1c',
+    border: '1px solid #333',
+    borderRadius: '6px',
     color: 'white',
-    marginTop: '5px',
+    marginTop: '2px',
+    outline: 'none',
   },
   button: {
     width: '100%',

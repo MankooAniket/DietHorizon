@@ -24,7 +24,7 @@ function BMICalculator() {
 
   return (
     <div style={styles.container}>
-      <div style={styles.overlay}></div> {/* Overlay element to dull the background */}
+      <div style={styles.overlay}></div>
       <div style={styles.card}>
         <h1 style={styles.heading}>BMI Calculator</h1>
         <div style={styles.formGroup}>
@@ -64,7 +64,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100vh',
+    minHeight: 'calc(100vh - 72px)',
     backgroundImage: 'url(/bmi.jpg)',
     backgroundSize: 'cover',
     backgroundPosition: 'center center',
@@ -81,9 +81,9 @@ const styles = {
     zIndex: 1, // Ensure it's behind the content
   },
   card: {
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'rgba(15, 15, 15, 0.9)',
+    borderRadius: '16px',
+    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.7)',
     padding: '40px 60px',
     width: '100%',
     maxWidth: '400px',
@@ -91,8 +91,8 @@ const styles = {
     zIndex: 2, // Ensure content is above the overlay
   },
   heading: {
-    color: '#333',
-    fontSize: '24px',
+    color: '#ffffff',
+    fontSize: '26px',
     marginBottom: '20px',
   },
   formGroup: {
@@ -100,21 +100,23 @@ const styles = {
     textAlign: 'left',
   },
   label: {
-    fontSize: '16px',
-    color: '#555',
+    fontSize: '14px',
+    color: '#e0e0e0',
     marginBottom: '5px',
     display: 'block',
   },
   input: {
     width: '100%',
-    padding: '12px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    color: '#333',
+    padding: '10px 12px',
+    border: '1px solid #333',
+    borderRadius: '8px',
+    fontSize: '15px',
+    color: '#f5f5f5',
+    backgroundColor: '#181818',
+    outline: 'none',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00c896',
     color: 'white',
     padding: '12px 0',
     fontSize: '16px',
@@ -129,10 +131,10 @@ const styles = {
   },
   result: {
     marginTop: '20px',
-    backgroundColor: '#45a049',
-    padding: '15px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.05)',
+    backgroundColor: 'rgba(0, 200, 150, 0.12)',
+    padding: '16px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
   },
 };
 

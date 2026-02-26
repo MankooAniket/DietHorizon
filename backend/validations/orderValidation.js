@@ -1,18 +1,28 @@
 const { check } = require("express-validator");
 
 // ✅ Place order validation
+// Adapted to work with frontend Checkout component:
+// expects items[], paymentMethod ('cod' etc.), and a text shippingAddress.
 exports.validatePlaceOrder = [
-    check("cartId")
-        .notEmpty().withMessage("Cart ID is required")
-        .isMongoId().withMessage("Invalid cart ID format"),
+    check("items")
+        .isArray({ min: 1 }).withMessage("At least one item is required"),
+
+    check("items.*.product")
+        .notEmpty().withMessage("Product ID is required for each item")
+        .isString().withMessage("Product ID must be a string"),
+
+    check("items.*.quantity")
+        .notEmpty().withMessage("Quantity is required for each item")
+        .isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
 
     check("paymentMethod")
         .notEmpty().withMessage("Payment method is required")
-        .isIn(["CreditCard", "DebitCard", "PayPal", "Cash"]).withMessage("Invalid payment method"),
+        .isIn(["cod", "COD", "Credit Card", "Debit Card", "UPI", "Net Banking"])
+        .withMessage("Invalid payment method"),
 
     check("shippingAddress")
         .notEmpty().withMessage("Shipping address is required")
-        .isMongoId().withMessage("Invalid shipping address ID format")
+        .isString().withMessage("Shipping address must be text"),
 ];
 
 // ✅ Order status update validation

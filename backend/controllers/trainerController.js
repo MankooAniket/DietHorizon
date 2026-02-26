@@ -1,5 +1,7 @@
 // controllers/trainerController.js
 const User = require('../models/userModel');
+const DietPlan = require('../models/dietPlanModel');
+const WorkoutPlan = require('../models/workoutPlanModel');
 const ErrorResponse = require('../utils/errorResponse');
 const errorMessages = require('../utils/errorMessages');
 const asyncHandler = require('../middlewares/asyncHandler');

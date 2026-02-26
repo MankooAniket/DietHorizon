@@ -134,10 +134,12 @@ function UserDashboard() {
 
 const styles = {
   container: {
-    padding: '40px',
-    backgroundColor: '#121212',
-    minHeight: '100vh',
+    padding: '40px 20px',
+    backgroundColor: '#050505',
+    minHeight: 'calc(100vh - 72px)',
     color: '#fff',
+    maxWidth: '1200px',
+    margin: '0 auto',
   },
   heading: {
     fontSize: '28px',

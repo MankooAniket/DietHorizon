@@ -1,3 +1,5 @@
+const ErrorResponse = require('../utils/errorResponse');
+
 /**
  * Async handler to eliminate try-catch blocks in controllers
  * @param {Function} fn - The async controller function

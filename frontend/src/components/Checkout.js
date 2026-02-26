@@ -39,13 +39,17 @@ function Checkout() {
       // Prepare the order data in the correct format
       const orderData = {
         items: cartItems.map(item => ({
-          product: item.id || item._id || item.productId, // Try different possible property names
+          product: item.id || item._id || item.productId,
+          name: item.name,
+          image: item.img || item.image,
           quantity: item.quantity,
-          price: item.price
+          // Strip "Rs " prefix if present so backend gets a number
+          price: typeof item.price === 'string'
+            ? parseFloat(item.price.replace('Rs ', ''))
+            : item.price,
         })),
-        totalAmount: getCartTotal(),
         shippingAddress: address,
-        paymentMethod: paymentMethod
+        paymentMethod: paymentMethod,
       };
 
       // Log the complete order data for debugging

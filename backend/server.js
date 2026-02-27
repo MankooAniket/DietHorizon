@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Enable CORS
-app.use(cors());
+app.use(cors({ origin: ['https://diet-horizon.vercel.app'], credentials: true }));
 
 // Mount routers
 app.use('/api/auth', authRoutes);

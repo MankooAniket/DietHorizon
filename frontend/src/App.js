@@ -53,7 +53,7 @@ function App() {
             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
             <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-            <Route path="/recipes-generator" element={<ProtectedRoute><AiRecipeGenerator /></ProtectedRoute>} />
+            <Route path="/recipe-generator" element={<ProtectedRoute><AiRecipeGenerator /></ProtectedRoute>} />
 
             {/* Trainer Routes */}
             <Route path="/trainer" element={<ProtectedRoute><TrainerDashboard /></ProtectedRoute>} />

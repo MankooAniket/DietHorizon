@@ -5,7 +5,7 @@ const config = {
   apiUrl:
     process.env.REACT_APP_API_URL ||
     process.env.API_BASE_URL ||
-    "https://diethorizon.onrender.com",
+    "http://localhost:3300/api",
 
   // Optional: Spoonacular API key if you ever need it on the client
   spoonacularApiKey:

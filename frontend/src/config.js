@@ -3,9 +3,7 @@
 const config = {
   // Backend API base URL
   apiUrl:
-    process.env.REACT_APP_API_URL ||
-    process.env.API_BASE_URL ||
-    "http://localhost:3300/api",
+    process.env.REACT_APP_API_URL || "http://localhost:3300/api",
 
   // Optional: Spoonacular API key if you ever need it on the client
   spoonacularApiKey:

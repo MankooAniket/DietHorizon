@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
  * @param {string} id - User ID to include in token
  * @returns {string} Signed JWT
  */
-const generateToken = (id) => {
+const generateToken = (user) => {
   return jwt.sign(
-    { userId: id },
+    { userId: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '30d' }
   );
@@ -32,7 +32,7 @@ const verifyToken = (token) => {
 const sendTokenResponse = (user, statusCode, res, message) => {
   // Generate token directly using the user ID
   const token = jwt.sign(
-    { userId: user._id },
+    { userId: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '30d' }
   );
